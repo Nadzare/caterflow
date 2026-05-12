@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  KITCHEN
+  LOGISTIC
+}
+
+enum OrderStatus {
+  QUOTATION
+  DP_PAID
+  IN_PRODUCTION
+  DELIVERING
+  COMPLETED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  phone     String?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id                     String   @id @default(uuid())
+  companyName            String
+  picName                String
+  email                  String?
+  phone                  String?
+  logisticAddress        String
+  dietaryAlerts          Json?
+  operationalPreferences Json?
+  orders                 Order[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Menu {
+  id             String      @id @default(uuid())
+  name           String
+  category       String
+  basePrice      Float
+  allergenLabels Json?
+  orderItems     OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  clientId    String
+  client      Client      @relation(fields: [clientId], references: [id])
+  status      OrderStatus @default(QUOTATION)
+  totalAmount Float
+  orderDate   DateTime
+  orderItems  OrderItem[]
+  delivery    Delivery?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+  menuId   String
+  menu     Menu   @relation(fields: [menuId], references: [id])
+  quantity Int
+  subtotal Float
+}
+
+model Delivery {
+  id           String   @id @default(uuid())
+  orderId      String   @unique
+  order        Order    @relation(fields: [orderId], references: [id])
+  deliveryDate DateTime
+  deliveryTime String
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
