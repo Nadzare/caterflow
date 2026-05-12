@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #f9fafb;
+  --card-foreground: #111827;
+  --border: #e5e7eb;
+  --primary: #111827;
+  --primary-foreground: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    --border: #334155;
+    --primary: #f8fafc;
+    --primary-foreground: #0f172a;
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+}
+
+/* Flat UI classes */
+.flat-card {
+  @apply bg-[var(--card)] border border-[var(--border)] p-6;
+}
+
+.flat-button {
+  @apply bg-[var(--primary)] text-[var(--primary-foreground)] px-4 py-2 transition-opacity hover:opacity-90 active:opacity-100 disabled:opacity-50;
+}
+
+.flat-input {
+  @apply bg-transparent border border-[var(--border)] px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[var(--primary)];
+}
+
+/* FullCalendar Custom Flat Styles */
+.fc {
+  --fc-border-color: var(--border);
+  --fc-button-bg-color: var(--primary);
+  --fc-button-border-color: var(--primary);
+  --fc-button-hover-bg-color: var(--primary);
+  --fc-button-hover-border-color: var(--primary);
+  --fc-button-active-bg-color: var(--primary);
+  --fc-button-active-border-color: var(--primary);
+  --fc-event-bg-color: var(--primary);
+  --fc-event-border-color: transparent;
+  --fc-today-bg-color: rgba(0, 0, 0, 0.05);
+}
+.dark .fc-today-bg-color {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.fc-header-toolbar {
+  margin-bottom: 2rem !important;
+}
+.fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+.fc-button {
+  border-radius: 0 !important;
+  text-transform: capitalize !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+.fc-col-header-cell-cushion {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  padding: 1rem 0 !important;
+  color: var(--foreground) !important;
+  text-decoration: none !important;
+}
+.fc-daygrid-day-number {
+  font-size: 0.875rem !important;
+  color: var(--foreground) !important;
+  text-decoration: none !important;
+  padding: 8px !important;
+}
+.fc-theme-standard td, .fc-theme-standard th {
+  border: 1px solid var(--border) !important;
 }
