@@ -45,29 +45,48 @@ export async function getDashboardStats() {
     })
   );
 
-  // For chart data: Orders per day for the last 7 days
+  // For chart data: Orders per day for the last 7 days (grouped in JS to avoid timezone/time grouping issues)
   const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+  sevenDaysAgo.setHours(0, 0, 0, 0);
 
-  const orderTrends = await prisma.order.groupBy({
-    by: ['orderDate'],
-    _count: {
-      id: true,
-    },
+  const recentOrders = await prisma.order.findMany({
     where: {
       orderDate: {
         gte: sevenDaysAgo,
       },
     },
-    orderBy: {
-      orderDate: 'asc',
+    select: {
+      orderDate: true,
     },
   });
 
-  const chartData = orderTrends.map((d) => ({
-    date: d.orderDate.toLocaleDateString('en-US', { weekday: 'short' }),
-    orders: d._count.id,
-  }));
+  const dailyCounts: Record<string, number> = {};
+  const chartData = [];
+
+  // Initialize the last 7 days (from 6 days ago up to today) with 0
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+    dailyCounts[dayLabel] = 0;
+  }
+
+  // Aggregate order counts by day label
+  recentOrders.forEach((order) => {
+    const dayLabel = order.orderDate.toLocaleDateString('en-US', { weekday: 'short' });
+    if (dayLabel in dailyCounts) {
+      dailyCounts[dayLabel]++;
+    }
+  });
+
+  // Convert map to Recharts format
+  for (const [date, count] of Object.entries(dailyCounts)) {
+    chartData.push({
+      date,
+      orders: count,
+    });
+  }
 
   return {
     totalRevenue: totalRevenue._sum.totalAmount || 0,

@@ -2,7 +2,8 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MoreHorizontal, Calendar, DollarSign } from 'lucide-react';
+import { MoreHorizontal, Calendar, DollarSign, FileText } from 'lucide-react';
+import { generateInvoicePDF } from '@/lib/invoiceGenerator';
 
 interface KanbanCardProps {
   order: any;
@@ -27,6 +28,12 @@ export function KanbanCard({ order }: KanbanCardProps) {
   const style = {
     transition,
     transform: CSS.Translate.toString(transform),
+  };
+
+  const handleDownloadInvoice = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    generateInvoicePDF(order);
   };
 
   if (isDragging) {
@@ -96,6 +103,16 @@ export function KanbanCard({ order }: KanbanCardProps) {
           {order.orderItems.length} items
         </span>
       </div>
+
+      {order.status === 'COMPLETED' && (
+        <button
+          onClick={handleDownloadInvoice}
+          className="mt-4 w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          Download Invoice
+        </button>
+      )}
     </div>
   );
 }
