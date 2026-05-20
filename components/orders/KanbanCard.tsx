@@ -1,15 +1,21 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MoreHorizontal, Calendar, DollarSign, FileText } from 'lucide-react';
+import { MoreHorizontal, Calendar, DollarSign, FileText, Edit, Trash2 } from 'lucide-react';
 import { generateInvoicePDF } from '@/lib/invoiceGenerator';
 
 interface KanbanCardProps {
   order: any;
+  onEditOrder?: (order: any) => void;
+  onDeleteOrder?: (order: any) => void;
 }
 
-export function KanbanCard({ order }: KanbanCardProps) {
+export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const {
     attributes,
     listeners,
@@ -29,6 +35,16 @@ export function KanbanCard({ order }: KanbanCardProps) {
     transition,
     transform: CSS.Translate.toString(transform),
   };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleDownloadInvoice = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,11 +73,60 @@ export function KanbanCard({ order }: KanbanCardProps) {
       {/* Top Card Bar */}
       <div className="flex justify-between items-center mb-2.5">
         <span className="text-[10px] font-bold text-slate-400 dark:text-stone-500 bg-slate-50 dark:bg-stone-800/80 px-2 py-0.5 rounded-full uppercase tracking-wider">
-          #{order.id.slice(0, 8)}
+          #{order.id.slice(0, 8).toUpperCase()}
         </span>
-        <button className="p-1 hover:bg-slate-50 dark:hover:bg-stone-850 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer">
-          <MoreHorizontal className="w-3.5 h-3.5" />
-        </button>
+        
+        {/* Dropdown Menu Container */}
+        <div ref={menuRef} className="relative">
+          <button 
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen(!menuOpen);
+            }}
+            className="p-1 hover:bg-slate-50 dark:hover:bg-stone-850 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+          >
+            <MoreHorizontal className="w-3.5 h-3.5" />
+          </button>
+          
+          {menuOpen && (
+            <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-[#1A1715] border border-[var(--border)] rounded-xl shadow-lg z-30 py-1 overflow-hidden animate-fade-in-up text-left">
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen(false);
+                  onEditOrder?.(order);
+                }}
+                className="w-full px-4 py-2 text-xs font-semibold text-slate-700 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-[#24201D] flex items-center gap-2 cursor-pointer"
+              >
+                <Edit className="w-3.5 h-3.5 text-slate-400" /> Edit Order
+              </button>
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen(false);
+                  handleDownloadInvoice(e);
+                }}
+                className="w-full px-4 py-2 text-xs font-semibold text-slate-700 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-[#24201D] flex items-center gap-2 cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-slate-400" /> Invoice PDF
+              </button>
+              <button
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen(false);
+                  onDeleteOrder?.(order);
+                }}
+                className="w-full px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/15 flex items-center gap-2 cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-red-400" /> Delete
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Company Name */}
@@ -116,4 +181,5 @@ export function KanbanCard({ order }: KanbanCardProps) {
     </div>
   );
 }
+
 

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useModals } from './ModalsContext';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,6 +29,8 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { openUpgrade, openSettings, openLogout } = useModals();
+
 
   return (
     <aside className="w-64 border-r border-[var(--border)] bg-white dark:bg-[#1A1715] flex flex-col h-screen sticky top-0 z-30 transition-colors duration-200">
@@ -72,7 +75,10 @@ export function Sidebar() {
           <p className="text-xs text-slate-600 dark:text-stone-300 leading-relaxed font-medium">
             Streamline catering operations with real-time analytics.
           </p>
-          <button className="flat-button py-2 px-3 text-xs w-full justify-center rounded-lg shadow-sm hover:shadow">
+          <button 
+            onClick={openUpgrade}
+            className="flat-button py-2 px-3 text-xs w-full justify-center rounded-lg shadow-sm hover:shadow"
+          >
             Upgrade Now
           </button>
         </div>
@@ -80,11 +86,17 @@ export function Sidebar() {
 
       {/* Footer Nav */}
       <div className="p-4 border-t border-[var(--border)] space-y-1">
-        <button className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-stone-400 hover:bg-slate-50 dark:hover:bg-[#24201D] hover:text-slate-800 dark:hover:text-stone-100 w-full rounded-xl transition-all duration-200">
+        <button 
+          onClick={openSettings}
+          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-500 dark:text-stone-400 hover:bg-slate-50 dark:hover:bg-[#24201D] hover:text-slate-800 dark:hover:text-stone-100 w-full rounded-xl transition-all duration-200"
+        >
           <Settings className="w-5 h-5 text-slate-400 dark:text-stone-500" />
           Settings
         </button>
-        <button className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/10 w-full rounded-xl transition-all duration-200">
+        <button 
+          onClick={openLogout}
+          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/10 w-full rounded-xl transition-all duration-200"
+        >
           <LogOut className="w-5 h-5" />
           Logout
         </button>
@@ -92,4 +104,5 @@ export function Sidebar() {
     </aside>
   );
 }
+
 

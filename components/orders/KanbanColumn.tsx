@@ -8,9 +8,11 @@ interface KanbanColumnProps {
   id: string;
   title: string;
   orders: any[];
+  onEditOrder: (order: any) => void;
+  onDeleteOrder: (order: any) => void;
 }
 
-export function KanbanColumn({ id, title, orders }: KanbanColumnProps) {
+export function KanbanColumn({ id, title, orders, onEditOrder, onDeleteOrder }: KanbanColumnProps) {
   const { setNodeRef } = useDroppable({
     id,
   });
@@ -37,7 +39,12 @@ export function KanbanColumn({ id, title, orders }: KanbanColumnProps) {
           strategy={verticalListSortingStrategy}
         >
           {orders.map((order) => (
-            <KanbanCard key={order.id} order={order} />
+            <KanbanCard 
+              key={order.id} 
+              order={order} 
+              onEditOrder={onEditOrder} 
+              onDeleteOrder={onDeleteOrder}
+            />
           ))}
         </SortableContext>
         
@@ -47,6 +54,7 @@ export function KanbanColumn({ id, title, orders }: KanbanColumnProps) {
             No orders in {title.toLowerCase()}
           </div>
         )}
+
       </div>
     </div>
   );
