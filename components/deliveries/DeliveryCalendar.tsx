@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Truck, X } from 'lucide-react';
+
 import { rescheduleDelivery, completeDelivery } from '@/app/actions/deliveryActions';
 import { useToast } from '@/components/Toast';
 
@@ -113,7 +113,7 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border)] bg-slate-50/20 dark:bg-stone-900/5">
         <h2 className="text-base font-extrabold text-slate-800 dark:text-stone-100 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-[var(--primary)]" />
+          <i className="fa-regular fa-calendar text-base text-[var(--primary)]" />
           {MONTHS[currentMonth]} {currentYear}
         </h2>
         <div className="flex items-center gap-1.5">
@@ -121,7 +121,7 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
             onClick={prevMonth}
             className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-stone-800 text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <i className="fa-solid fa-chevron-left text-xs" />
           </button>
           <button
             onClick={() => { setCurrentMonth(today.getMonth()); setCurrentYear(today.getFullYear()); setSelectedDay(null); }}
@@ -133,7 +133,7 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
             onClick={nextMonth}
             className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-stone-800 text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
           >
-            <ChevronRight className="w-4 h-4" />
+            <i className="fa-solid fa-chevron-right text-xs" />
           </button>
         </div>
       </div>
@@ -232,11 +232,11 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
                       </div>
                       <div className="text-xs text-slate-400 dark:text-stone-500 flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 font-semibold">
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <i className="fa-regular fa-clock text-[11px] text-slate-400" />
                           {ev.extendedProps?.time || '—'}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Truck className="w-3.5 h-3.5 text-slate-400" />
+                          <i className="fa-solid fa-truck text-[11px] text-slate-400" />
                           <span className="uppercase text-[10px] tracking-wider font-bold" style={{ color: ev.backgroundColor || 'var(--primary)' }}>
                             {ev.extendedProps?.status || 'SCHEDULED'}
                           </span>
@@ -290,7 +290,7 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
                 onClick={() => setRescheduleOpen(false)}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <i className="fa-solid fa-xmark text-lg" />
               </button>
             </div>
 
@@ -312,7 +312,7 @@ export default function DeliveryCalendar({ events }: DeliveryCalendarProps) {
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">New Delivery Time</label>
                 <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <i className="fa-regular fa-clock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
                   <input
                     type="text"
                     required

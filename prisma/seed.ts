@@ -8,45 +8,49 @@ async function main() {
   // 1. Users
   const owner = await prisma.user.upsert({
     where: { email: 'owner@caterflow.com' },
-    update: {},
+    update: { activated: true },
     create: {
       email: 'owner@caterflow.com',
       name: 'Owner',
       phone: '0851 9085 9889',
       role: 'OWNER',
+      activated: true,
     },
   });
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@caterflow.com' },
-    update: {},
+    update: { activated: true },
     create: {
       email: 'admin@caterflow.com',
       name: 'Admin',
       phone: '081234567890',
       role: 'ADMIN',
+      activated: true,
     },
   });
 
   const kitchen = await prisma.user.upsert({
     where: { email: 'kitchen@caterflow.com' },
-    update: {},
+    update: { activated: true },
     create: {
       email: 'kitchen@caterflow.com',
       name: 'Kitchen Staff',
       phone: '081234567891',
       role: 'KITCHEN',
+      activated: true,
     },
   });
 
   const logistic = await prisma.user.upsert({
     where: { email: 'logistic@caterflow.com' },
-    update: {},
+    update: { activated: true },
     create: {
       email: 'logistic@caterflow.com',
       name: 'Logistic Driver',
       phone: '081234567892',
       role: 'LOGISTIC',
+      activated: true,
     },
   });
 

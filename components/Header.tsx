@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Settings, Sun, Moon, Users, ClipboardList, CheckCircle } from 'lucide-react';
+
 import { useTheme } from './ThemeProvider';
 import { useModals } from './ModalsContext';
+import { useAuth } from '@/lib/AuthContext';
 import { searchEntities } from '@/app/actions/searchActions';
 import Link from 'next/link';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
   const { openSettings } = useModals();
+  const { profile } = useAuth();
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,7 +68,7 @@ export function Header() {
     <header className="h-20 border-b border-[var(--border)] bg-white dark:bg-[#1A1715] flex items-center justify-between px-8 sticky top-0 z-20 transition-colors duration-300">
       {/* Search Bar */}
       <div ref={searchRef} className="relative w-80">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-stone-500" />
+        <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 dark:text-stone-500" />
         <input 
           type="text" 
           placeholder="Search anything..." 
@@ -87,7 +89,7 @@ export function Header() {
                 {searchResults.clients.length > 0 && (
                   <div className="p-3">
                     <h4 className="text-[10px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider mb-2 px-2 flex items-center gap-1.5">
-                      <Users className="w-3 h-3" /> Clients
+                      <i className="fa-solid fa-users text-[10px] mr-1" /> Clients
                     </h4>
                     <div className="space-y-1">
                       {searchResults.clients.map((c) => (
@@ -107,7 +109,7 @@ export function Header() {
                 {searchResults.orders.length > 0 && (
                   <div className="p-3">
                     <h4 className="text-[10px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider mb-2 px-2 flex items-center gap-1.5">
-                      <ClipboardList className="w-3 h-3" /> Orders
+                      <i className="fa-solid fa-clipboard-list text-[10px] mr-1" /> Orders
                     </h4>
                     <div className="space-y-1">
                       {searchResults.orders.map((o) => (
@@ -138,7 +140,7 @@ export function Header() {
             onClick={() => setNotifOpen(!notifOpen)}
             className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#24201D] text-slate-500 dark:text-stone-400 relative transition-colors duration-200 cursor-pointer"
           >
-            <Bell className="w-5 h-5" />
+            <i className="fa-regular fa-bell text-lg flex items-center justify-center w-5 h-5" />
             {unreadCount > 0 && (
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[var(--primary)] rounded-full ring-2 ring-white dark:ring-[#1A1715]" />
             )}
@@ -183,9 +185,9 @@ export function Header() {
           className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#24201D] text-slate-500 dark:text-stone-400 transition-all duration-200 cursor-pointer"
         >
           {theme === 'dark' ? (
-            <Sun className="w-5 h-5 text-amber-400" />
+            <i className="fa-regular fa-sun text-lg text-amber-400 flex items-center justify-center w-5 h-5" />
           ) : (
-            <Moon className="w-5 h-5" />
+            <i className="fa-regular fa-moon text-lg flex items-center justify-center w-5 h-5" />
           )}
         </button>
 
@@ -194,7 +196,7 @@ export function Header() {
           onClick={openSettings}
           className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#24201D] text-slate-500 dark:text-stone-400 transition-colors duration-200 cursor-pointer"
         >
-          <Settings className="w-5 h-5" />
+          <i className="fa-solid fa-gear text-lg flex items-center justify-center w-5 h-5" />
         </button>
 
         {/* Divider */}
@@ -203,14 +205,18 @@ export function Header() {
         {/* Profile Card */}
         <div className="flex items-center gap-3">
           <div className="flex flex-col text-right hidden sm:flex">
-            <span className="text-sm font-semibold text-slate-800 dark:text-stone-200 leading-tight">Orlando Laurentius</span>
-            <span className="text-[11px] text-slate-400 dark:text-stone-500 font-bold uppercase tracking-wider">Admin</span>
+            <span className="text-sm font-semibold text-slate-800 dark:text-stone-200 leading-tight">
+              {profile?.name || 'CaterFlow Admin'}
+            </span>
+            <span className="text-[11px] text-slate-400 dark:text-stone-500 font-bold uppercase tracking-wider">
+              {profile?.role || 'Admin'}
+            </span>
           </div>
           <button 
             onClick={openSettings}
             className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-950/45 text-[var(--primary)] flex items-center justify-center font-bold text-sm border border-orange-200/50 dark:border-orange-900/30 cursor-pointer"
           >
-            OL
+            {(profile?.name || 'Admin').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
           </button>
         </div>
       </div>

@@ -1,13 +1,18 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react';
-import { Sparkles, Check, Settings, ShieldAlert, LogOut } from 'lucide-react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
 import { useToast } from './Toast';
+import { useAuth } from '@/lib/AuthContext';
+import { updateUserProfile } from '@/app/actions/userActions';
+import { AuthModal } from './AuthModal';
 
 interface ModalsContextType {
   openSettings: () => void;
   openUpgrade: () => void;
   openLogout: () => void;
+  openAuth: (mode?: 'login' | 'activate') => void;
+  closeAuth: () => void;
 }
 
 const ModalsContext = createContext<ModalsContextType | undefined>(undefined);
@@ -22,7 +27,11 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'activate'>('login');
+  
   const { toast } = useToast();
+  const { profile, signOut, refreshProfile } = useAuth();
 
   // Settings State
   const [profileName, setProfileName] = useState('Orlando Laurentius');
@@ -30,18 +39,41 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
   const [profilePhone, setProfilePhone] = useState('0851 9085 9889');
   const [notifPref, setNotifPref] = useState(true);
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  // Sync state with database user profile when loaded
+  useEffect(() => {
+    if (profile) {
+      setProfileName(profile.name);
+      setProfileEmail(profile.email);
+      setProfilePhone(profile.phone || '');
+    }
+  }, [profile]);
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast('Settings saved successfully!', 'success');
-    setSettingsOpen(false);
+    if (!profile) return;
+    
+    try {
+      await updateUserProfile(profile.id, profileName, profilePhone);
+      await refreshProfile();
+      toast('Pengaturan berhasil disimpan!', 'success');
+      setSettingsOpen(false);
+    } catch (err: any) {
+      toast(err.message || 'Gagal menyimpan pengaturan.', 'error');
+    }
   };
 
-  const handleLogout = () => {
-    toast('Logging out...', 'info');
+  const handleLogout = async () => {
+    toast('Sedang keluar...', 'info');
     setLogoutOpen(false);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    try {
+      await signOut();
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+    } catch (err) {
+      console.error(err);
+      window.location.href = '/';
+    }
   };
 
   return (
@@ -50,6 +82,11 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
         openSettings: () => setSettingsOpen(true),
         openUpgrade: () => setUpgradeOpen(true),
         openLogout: () => setLogoutOpen(true),
+        openAuth: (mode = 'login') => {
+          setAuthMode(mode);
+          setAuthOpen(true);
+        },
+        closeAuth: () => setAuthOpen(false),
       }}
     >
       {children}
@@ -60,7 +97,7 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
           <div className="bg-white dark:bg-[#1A1715] rounded-3xl border border-[var(--border)] max-w-md w-full p-6 shadow-2xl relative overflow-hidden animate-fade-in-up">
             <div className="absolute -right-16 -top-16 w-36 h-36 bg-[var(--primary-light)] opacity-40 rounded-full blur-2xl" />
             <div className="flex items-center gap-2.5 text-[var(--primary)] font-bold text-xs uppercase tracking-wider mb-4">
-              <Sparkles className="w-5 h-5 animate-pulse" />
+              <i className="fa-solid fa-wand-magic-sparkles text-lg animate-pulse" />
               CaterFlow Plus
             </div>
             <h3 className="text-xl font-extrabold text-slate-800 dark:text-stone-100 mb-2">Upgrade to Plus Plan</h3>
@@ -78,10 +115,10 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
                 </span>
               </div>
               <ul className="space-y-2.5 text-xs text-slate-600 dark:text-stone-300 font-semibold">
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Unlimited B2B CRM Clients</li>
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Premium PDF Invoice Customization</li>
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Real-time Logistics & GPS Tracking</li>
-                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> WhatsApp Automated Notifications</li>
+                <li className="flex items-center gap-2"><i className="fa-solid fa-check text-emerald-500 text-sm" /> Unlimited B2B CRM Clients</li>
+                <li className="flex items-center gap-2"><i className="fa-solid fa-check text-emerald-500 text-sm" /> Premium PDF Invoice Customization</li>
+                <li className="flex items-center gap-2"><i className="fa-solid fa-check text-emerald-500 text-sm" /> Real-time Logistics & GPS Tracking</li>
+                <li className="flex items-center gap-2"><i className="fa-solid fa-check text-emerald-500 text-sm" /> WhatsApp Automated Notifications</li>
               </ul>
             </div>
             <div className="flex gap-3">
@@ -116,7 +153,7 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
           >
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-4 mb-5">
               <h3 className="text-lg font-bold text-slate-800 dark:text-stone-100 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-slate-400" /> System Settings
+                <i className="fa-solid fa-gear text-slate-400" /> System Settings
               </h3>
               <button
                 type="button"
@@ -197,7 +234,7 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1A1715] rounded-3xl border border-[var(--border)] max-w-sm w-full p-6 shadow-2xl text-center animate-fade-in-up">
             <div className="w-12 h-12 bg-red-50 dark:bg-red-950/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100/50 dark:border-red-900/20">
-              <ShieldAlert className="w-6 h-6" />
+              <i className="fa-solid fa-circle-exclamation text-xl" />
             </div>
             <h3 className="text-base font-extrabold text-slate-800 dark:text-stone-100 mb-1.5">Confirm Logout</h3>
             <p className="text-xs text-slate-400 font-medium mb-6 leading-relaxed">
@@ -216,12 +253,22 @@ export function ModalsProvider({ children }: { children: React.ReactNode }) {
                 onClick={handleLogout}
                 className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow duration-200"
               >
-                <LogOut className="w-3.5 h-3.5" /> Logout
+                <i className="fa-solid fa-right-from-bracket text-xs mr-1" /> Logout
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        initialMode={authMode}
+        onSuccess={() => {
+          window.location.href = '/dashboard';
+        }}
+      />
     </ModalsContext.Provider>
   );
 }

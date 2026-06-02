@@ -37,6 +37,31 @@
   --accent: #FFB03A;
 }
 
+/* Smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default focus outline from styled interactive elements (navbar, buttons) */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Prevent black outline flash on border transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth border-color transitions everywhere */
+a, button {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -187,5 +212,32 @@ body {
 
 .fc-daygrid-day.fc-day-today {
   background-color: var(--primary-light) !important;
+}
+
+/* Custom Culinary Floating Animation */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 4s ease-in-out infinite;
 }
 

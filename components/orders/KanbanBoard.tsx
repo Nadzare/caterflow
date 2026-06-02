@@ -23,7 +23,7 @@ import {
   getOrderDetails 
 } from '@/app/actions/orderActions';
 import { OrderStatus } from '@prisma/client';
-import { Plus, X, Trash2, Calendar as CalendarIcon, Clock, DollarSign } from 'lucide-react';
+
 import { useToast } from '@/components/Toast';
 
 interface KanbanBoardProps {
@@ -322,7 +322,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
           <p className="text-sm text-slate-500 dark:text-stone-400 font-medium">Track, manage and process catering orders in real-time.</p>
         </div>
         <button onClick={handleOpenCreate} className="flat-button">
-          <Plus className="w-4 h-4" /> New Order
+          <i className="fa-solid fa-plus mr-1.5" /> New Order
         </button>
       </div>
 
@@ -374,7 +374,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
                 onClick={() => setModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <i className="fa-solid fa-xmark text-lg" />
               </button>
             </div>
 
@@ -431,7 +431,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
                     onClick={handleAddItem}
                     className="text-xs font-bold text-[var(--primary)] hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Menu Item
+                    <i className="fa-solid fa-plus text-xs mr-1" /> Add Menu Item
                   </button>
                 </div>
 
@@ -480,7 +480,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
                             onClick={() => handleRemoveItem(index)}
                             className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl mt-4 cursor-pointer"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <i className="fa-solid fa-trash-can" />
                           </button>
                         </div>
                       );
@@ -507,7 +507,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Preferred Delivery Time</label>
                       <div className="relative">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <i className="fa-regular fa-clock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                           type="text"
                           required
@@ -526,7 +526,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
             {/* Modal Footer */}
             <div className="flex items-center justify-between border-t border-[var(--border)] pt-4 mt-2">
               <div className="flex items-center gap-1 text-slate-500 dark:text-stone-400">
-                <DollarSign className="w-4 h-4 text-slate-400" />
+                <i className="fa-solid fa-rupiah-sign text-sm text-slate-400" />
                 <span className="text-xs font-bold uppercase tracking-wider">Total Amount:</span>
                 <span className="text-sm font-extrabold text-slate-800 dark:text-stone-100 pl-1">
                   Rp {totalAmount.toLocaleString()}
@@ -554,7 +554,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1A1715] rounded-3xl border border-[var(--border)] max-w-sm w-full p-6 shadow-2xl text-center animate-fade-in-up">
             <div className="w-12 h-12 bg-red-50 dark:bg-red-950/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100/50 dark:border-red-900/20">
-              <Trash2 className="w-6 h-6" />
+              <i className="fa-solid fa-trash-can text-xl" />
             </div>
             <h3 className="text-base font-extrabold text-slate-800 dark:text-stone-100 mb-1.5">Delete Order</h3>
             <p className="text-xs text-slate-400 font-medium mb-6 leading-relaxed">
@@ -571,7 +571,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
                 onClick={handleDeleteConfirm}
                 className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow duration-200"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                <i className="fa-solid fa-trash-can text-xs mr-1.5" /> Confirm Delete
               </button>
             </div>
           </div>

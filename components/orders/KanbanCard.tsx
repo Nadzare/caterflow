@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MoreHorizontal, Calendar, DollarSign, FileText, Edit, Trash2 } from 'lucide-react';
+
 import { generateInvoicePDF } from '@/lib/invoiceGenerator';
 
 interface KanbanCardProps {
@@ -86,7 +86,7 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
             }}
             className="p-1 hover:bg-slate-50 dark:hover:bg-stone-850 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
           >
-            <MoreHorizontal className="w-3.5 h-3.5" />
+            <i className="fa-solid fa-ellipsis w-3.5 h-3.5 flex items-center justify-center text-xs" />
           </button>
           
           {menuOpen && (
@@ -100,7 +100,7 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
                 }}
                 className="w-full px-4 py-2 text-xs font-semibold text-slate-700 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-[#24201D] flex items-center gap-2 cursor-pointer"
               >
-                <Edit className="w-3.5 h-3.5 text-slate-400" /> Edit Order
+                <i className="fa-solid fa-pen-to-square w-3.5 h-3.5 flex items-center justify-center text-[11px] text-slate-400" /> Edit Order
               </button>
               <button
                 onPointerDown={(e) => e.stopPropagation()}
@@ -111,7 +111,7 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
                 }}
                 className="w-full px-4 py-2 text-xs font-semibold text-slate-700 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-[#24201D] flex items-center gap-2 cursor-pointer"
               >
-                <FileText className="w-3.5 h-3.5 text-slate-400" /> Invoice PDF
+                <i className="fa-solid fa-file-invoice w-3.5 h-3.5 flex items-center justify-center text-[11px] text-slate-400" /> Invoice PDF
               </button>
               <button
                 onPointerDown={(e) => e.stopPropagation()}
@@ -122,7 +122,7 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
                 }}
                 className="w-full px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/15 flex items-center gap-2 cursor-pointer"
               >
-                <Trash2 className="w-3.5 h-3.5 text-red-400" /> Delete
+                <i className="fa-solid fa-trash-can w-3.5 h-3.5 flex items-center justify-center text-[11px] text-red-400" /> Delete
               </button>
             </div>
           )}
@@ -135,13 +135,13 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
       {/* Meta Specs */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-stone-400">
-          <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+          <i className="fa-solid fa-rupiah-sign w-3.5 h-3.5 flex items-center justify-center text-[11px] text-slate-400" />
           <span className="font-semibold text-slate-800 dark:text-stone-200">
             Rp {order.totalAmount.toLocaleString()}
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-stone-500">
-          <Calendar className="w-3.5 h-3.5" />
+          <i className="fa-regular fa-calendar w-3.5 h-3.5 flex items-center justify-center text-[11px]" />
           <span>{new Date(order.orderDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</span>
         </div>
       </div>
@@ -174,7 +174,7 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
           onClick={handleDownloadInvoice}
           className="mt-4 w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
         >
-          <FileText className="w-3.5 h-3.5" />
+          <i className="fa-solid fa-file-invoice text-xs" />
           Download Invoice
         </button>
       )}

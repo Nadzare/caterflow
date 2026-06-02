@@ -1,20 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  Mail, 
-  Phone, 
-  AlertTriangle, 
-  UserPlus, 
-  X, 
-  Edit, 
-  Trash2,
-  CheckCircle,
-  Plus
-} from 'lucide-react';
+
 import { createClient, updateClient, deleteClient } from '@/app/actions/clientActions';
 import { useToast } from '@/components/Toast';
 
@@ -249,14 +236,14 @@ export function ClientsList({ initialClients }: ClientsListProps) {
           <p className="text-sm text-slate-500 dark:text-stone-400 font-medium">Manage and monitor your B2B catering partners.</p>
         </div>
         <button onClick={handleOpenCreate} className="flat-button">
-          <UserPlus className="w-4 h-4" /> Add New Client
+          <i className="fa-solid fa-user-plus mr-1.5" /> Add New Client
         </button>
       </div>
 
       {/* Search and Filters */}
       <div className="flex items-center gap-4 relative">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 dark:text-stone-500" />
+          <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-stone-500" />
           <input 
             type="text" 
             placeholder="Search clients by name, PIC or email..." 
@@ -272,7 +259,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
             onClick={() => setFilterOpen(!filterOpen)}
             className={`px-4 py-2.5 rounded-xl border ${filterOpen || halalOnly || kosherOnly || selectedExclusions.length > 0 ? 'border-[var(--primary)] bg-orange-50/50 dark:bg-orange-950/10 text-[var(--primary)]' : 'border-[var(--border)] bg-white dark:bg-[#1A1715] text-slate-700 dark:text-stone-200'} text-sm font-semibold flex items-center gap-2 transition-colors duration-200 cursor-pointer`}
           >
-            <Filter className="w-4 h-4 text-slate-400" /> Filter
+            <i className="fa-solid fa-filter text-slate-400 mr-1.5" /> Filter
             {(halalOnly || kosherOnly || selectedExclusions.length > 0) && (
               <span className="w-2 h-2 rounded-full bg-[var(--primary)]" />
             )}
@@ -353,10 +340,10 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                     <td className="py-4 px-6">
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-stone-400">
-                          <Mail className="w-3.5 h-3.5 text-slate-400" /> {client.email || '—'}
+                          <i className="fa-regular fa-envelope w-3.5 h-3.5 flex items-center justify-center text-slate-400" /> {client.email || '—'}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-stone-400">
-                          <Phone className="w-3.5 h-3.5 text-slate-400" /> {client.phone || '—'}
+                          <i className="fa-solid fa-phone w-3.5 h-3.5 flex items-center justify-center text-slate-400" /> {client.phone || '—'}
                         </div>
                       </div>
                     </td>
@@ -375,7 +362,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                           )}
                           {alerts?.allergies?.map((a: string) => (
                             <span key={a} className="px-2.5 py-0.5 bg-rose-50 text-rose-600 dark:bg-rose-950/20 dark:text-rose-400 border border-rose-100/50 dark:border-rose-900/20 text-[10px] font-bold rounded-full flex items-center gap-1">
-                              <AlertTriangle className="w-2.5 h-2.5 text-rose-500" /> {a.toUpperCase()}
+                              <i className="fa-solid fa-triangle-exclamation text-[10px] text-rose-500 mr-1" /> {a.toUpperCase()}
                             </span>
                           ))}
                         </div>
@@ -391,7 +378,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                         onClick={() => setActiveMenuId(activeMenuId === client.id ? null : client.id)}
                         className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-stone-800 text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 transition-colors duration-150 cursor-pointer"
                       >
-                        <MoreHorizontal className="w-4 h-4" />
+                        <i className="fa-solid fa-ellipsis w-4 h-4 flex items-center justify-center" />
                       </button>
 
                       {/* Dropdown Menu */}
@@ -401,13 +388,13 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                             onClick={() => handleOpenEdit(client)}
                             className="w-full px-4 py-2 text-xs font-semibold text-slate-700 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-[#24201D] flex items-center gap-2 cursor-pointer"
                           >
-                            <Edit className="w-3.5 h-3.5 text-slate-400" /> Edit Client
+                            <i className="fa-solid fa-pen-to-square w-3.5 h-3.5 flex items-center justify-center text-slate-400 text-xs" /> Edit Client
                           </button>
                           <button
                             onClick={() => handleOpenDelete(client)}
                             className="w-full px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/15 flex items-center gap-2 cursor-pointer"
                           >
-                            <Trash2 className="w-3.5 h-3.5 text-red-400" /> Delete
+                            <i className="fa-solid fa-trash-can w-3.5 h-3.5 flex items-center justify-center text-red-400 text-xs" /> Delete
                           </button>
                         </div>
                       )}
@@ -443,7 +430,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                 onClick={() => setModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <i className="fa-solid fa-xmark text-lg" />
               </button>
             </div>
 
@@ -580,7 +567,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1A1715] rounded-3xl border border-[var(--border)] max-w-sm w-full p-6 shadow-2xl text-center animate-fade-in-up">
             <div className="w-12 h-12 bg-red-50 dark:bg-red-950/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100/50 dark:border-red-900/20">
-              <AlertTriangle className="w-6 h-6" />
+              <i className="fa-solid fa-triangle-exclamation text-xl" />
             </div>
             <h3 className="text-base font-extrabold text-slate-800 dark:text-stone-100 mb-1.5">Delete Client</h3>
             <p className="text-xs text-slate-400 font-medium mb-6 leading-relaxed">
@@ -597,7 +584,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                 onClick={handleDeleteConfirm}
                 className="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow duration-200"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Confirm Delete
+                <i className="fa-solid fa-trash-can text-xs mr-1.5" /> Confirm Delete
               </button>
             </div>
           </div>

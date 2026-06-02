@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
-import { Header } from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/Toast";
 import { ModalsProvider } from "@/components/ModalsContext";
+import { AuthProvider } from "@/lib/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +35,7 @@ export default function RootLayout({
       <head>
         {/* Inline script to apply theme before React hydrates — prevents flash */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -46,19 +46,22 @@ export default function RootLayout({
             `,
           }}
         />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
       </head>
-      <body className="min-h-full flex bg-[var(--background)] text-[var(--foreground)]">
+      <body className="min-h-full bg-[var(--background)] text-[var(--foreground)]">
         <ThemeProvider>
           <ToastProvider>
-            <ModalsProvider>
-              <Sidebar />
-              <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto">
-                  {children}
-                </main>
-              </div>
-            </ModalsProvider>
+            <AuthProvider>
+              <ModalsProvider>
+                {children}
+              </ModalsProvider>
+            </AuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

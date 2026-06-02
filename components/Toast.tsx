@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle2, AlertCircle, X, Info } from 'lucide-react';
+
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -56,17 +56,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 : 'bg-blue-50 dark:bg-[#0f1d30] border-blue-200 dark:border-blue-900/40 text-blue-800 dark:text-blue-200'
             }`}
           >
-            {t.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />}
-            {t.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />}
-            {t.type === 'info' && <Info className="w-5 h-5 text-blue-500 shrink-0" />}
+            {t.type === 'success' && <i className="fa-solid fa-circle-check w-5 h-5 flex items-center justify-center text-emerald-500 shrink-0 text-base" />}
+            {t.type === 'error' && <i className="fa-solid fa-circle-exclamation w-5 h-5 flex items-center justify-center text-rose-500 shrink-0 text-base" />}
+            {t.type === 'info' && <i className="fa-solid fa-circle-info w-5 h-5 flex items-center justify-center text-blue-500 shrink-0 text-base" />}
             
             <p className="text-xs font-bold flex-1">{t.message}</p>
             
             <button
               onClick={() => removeToast(t.id)}
-              className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer flex items-center justify-center"
             >
-              <X className="w-3.5 h-3.5" />
+              <i className="fa-solid fa-xmark text-[11px]" />
             </button>
           </div>
         ))}

@@ -10,7 +10,7 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { Brain, Sparkles, Loader2, RefreshCw } from 'lucide-react';
+
 
 interface OrderChartProps {
   data: { date: string; orders: number }[];
@@ -99,7 +99,7 @@ export function OrderChart({ data }: OrderChartProps) {
       {/* Simulation Controls */}
       <div className="flex items-center justify-between bg-slate-50 dark:bg-stone-900/50 p-3 rounded-xl border border-slate-100 dark:border-stone-800/80">
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-[var(--primary)]" />
+          <i className="fa-solid fa-brain text-base text-[var(--primary)]" />
           <span className="text-xs font-semibold text-slate-600 dark:text-stone-300">
             Analisis Prediktif LSTM
           </span>
@@ -110,14 +110,14 @@ export function OrderChart({ data }: OrderChartProps) {
             onClick={runLSTMSimulation}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer shadow-sm shadow-orange-500/10"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <i className="fa-solid fa-wand-magic-sparkles text-xs mr-1" />
             Simulasikan LSTM
           </button>
         )}
 
         {simulationState === 'loading' && (
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-stone-400 font-medium">
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--primary)]" />
+            <i className="fa-solid fa-spinner fa-spin text-xs text-[var(--primary)]" />
             <span>{loadingStep}</span>
           </div>
         )}
@@ -127,7 +127,7 @@ export function OrderChart({ data }: OrderChartProps) {
             onClick={resetSimulation}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 hover:bg-slate-350 dark:bg-stone-800 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-300 text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <i className="fa-solid fa-rotate text-xs mr-1" />
             Reset Prediksi
           </button>
         )}
@@ -207,7 +207,7 @@ export function OrderChart({ data }: OrderChartProps) {
       {simulationState === 'success' && (
         <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100/50 dark:border-emerald-950/20 p-3.5 rounded-xl transition-all duration-300">
           <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
+            <i className="fa-solid fa-wand-magic-sparkles text-xs mr-1" />
             Rekomendasi Operasional Model LSTM
           </div>
           <p className="text-xs text-slate-600 dark:text-stone-300 leading-relaxed font-medium">
