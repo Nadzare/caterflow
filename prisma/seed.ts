@@ -8,12 +8,12 @@ async function main() {
   // 1. Users
   const owner = await prisma.user.upsert({
     where: { email: 'owner@caterflow.com' },
-    update: { activated: true },
+    update: { activated: true, role: 'SUPER_ADMIN' },
     create: {
       email: 'owner@caterflow.com',
       name: 'Owner',
       phone: '0851 9085 9889',
-      role: 'OWNER',
+      role: 'SUPER_ADMIN',
       activated: true,
     },
   });

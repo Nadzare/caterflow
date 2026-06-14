@@ -3,9 +3,14 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-export async function getDeliveries() {
+export async function getDeliveries(tenantId?: string) {
   try {
     const deliveries = await prisma.delivery.findMany({
+      where: tenantId ? {
+        order: {
+          tenantId
+        }
+      } : {},
       include: {
         order: {
           include: {

@@ -11,6 +11,7 @@ interface DbProfile {
   name: string;
   phone: string | null;
   role: string;
+  tenantId: string | null;
 }
 
 interface AuthContextType {

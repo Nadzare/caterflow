@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { OrderStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
-export async function getOrdersByStatus() {
+export async function getOrdersByStatus(tenantId?: string) {
   const orders = await prisma.order.findMany({
+    where: tenantId ? { tenantId } : {},
     include: {
       client: true,
       orderItems: {
@@ -68,9 +69,10 @@ export async function getOrderDetails(orderId: string) {
   }
 }
 
-export async function getMenus() {
+export async function getMenus(tenantId?: string) {
   try {
     const menus = await prisma.menu.findMany({
+      where: tenantId ? { tenantId } : {},
       orderBy: {
         name: 'asc',
       },
@@ -90,7 +92,7 @@ export async function createOrder(data: {
   items: Array<{ menuId: string; quantity: number; subtotal: number }>;
   deliveryDate?: string | Date;
   deliveryTime?: string;
-}) {
+}, tenantId?: string) {
   try {
     const order = await prisma.order.create({
       data: {
@@ -98,6 +100,7 @@ export async function createOrder(data: {
         status: data.status,
         totalAmount: data.totalAmount,
         orderDate: new Date(data.orderDate),
+        tenantId: tenantId || null,
         orderItems: {
           create: data.items.map((i) => ({
             menuId: i.menuId,

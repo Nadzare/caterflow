@@ -1,8 +1,31 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { getDeliveries } from '@/app/actions/deliveryActions';
 import { DeliveryCalendarWrapper } from '@/components/deliveries/DeliveryCalendarWrapper';
+import { useAuth } from '@/lib/AuthContext';
 
-export default async function DeliveriesPage() {
-  const deliveries = await getDeliveries();
+export default function DeliveriesPage() {
+  const { profile } = useAuth();
+  const [deliveries, setDeliveries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDeliveries() {
+      if (profile) {
+        setLoading(true);
+        try {
+          const data = await getDeliveries(profile.tenantId || undefined);
+          setDeliveries(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    loadDeliveries();
+  }, [profile]);
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
@@ -26,8 +49,13 @@ export default async function DeliveriesPage() {
         </div>
       </div>
 
-      <DeliveryCalendarWrapper events={deliveries} />
+      {loading ? (
+        <div className="flex items-center justify-center p-8 min-h-[40vh]">
+          <i className="fa-solid fa-circle-notch animate-spin text-[var(--primary)] text-xl" />
+        </div>
+      ) : (
+        <DeliveryCalendarWrapper events={deliveries} />
+      )}
     </div>
   );
 }
-

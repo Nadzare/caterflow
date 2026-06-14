@@ -17,6 +17,7 @@ export async function syncUserInDb(id: string, email: string, name: string, phon
         const role = existing.role;
         const existingName = existing.name;
         const existingPhone = existing.phone;
+        const tenantId = existing.tenantId;
         await prisma.user.delete({
           where: { email },
         });
@@ -29,6 +30,7 @@ export async function syncUserInDb(id: string, email: string, name: string, phon
             phone: existingPhone || phone || null,
             role,
             activated: true,
+            tenantId,
           },
         });
       } else {
@@ -96,9 +98,10 @@ export async function checkInvitation(email: string) {
   }
 }
 
-export async function getTeamMembers() {
+export async function getTeamMembers(tenantId?: string) {
   try {
     return await prisma.user.findMany({
+      where: tenantId ? { tenantId } : {},
       orderBy: { createdAt: 'asc' },
     });
   } catch (error) {
@@ -107,7 +110,7 @@ export async function getTeamMembers() {
   }
 }
 
-export async function addTeamMember(email: string, name: string, role: Role, phone?: string) {
+export async function addTeamMember(email: string, name: string, role: Role, phone?: string, tenantId?: string) {
   try {
     const existing = await prisma.user.findUnique({
       where: { email },
@@ -122,6 +125,7 @@ export async function addTeamMember(email: string, name: string, role: Role, pho
         role,
         phone: phone || null,
         activated: false,
+        tenantId: tenantId || null,
       },
     });
   } catch (error: any) {

@@ -29,6 +29,9 @@ export function Sidebar() {
   const isOwnerOrAdmin = profile?.role === 'OWNER' || profile?.role === 'ADMIN';
 
   const visibleNavItems = navItems.filter((item) => {
+    if (profile?.role === 'SUPER_ADMIN') {
+      return item.href === '/dashboard';
+    }
     if (item.href === '/clients' || item.href === '/team') {
       return isOwnerOrAdmin;
     }
@@ -74,24 +77,26 @@ export function Sidebar() {
       </nav>
 
       {/* Promo Banner Card */}
-      <div className="px-4 mb-4">
-        <div className="p-4 bg-orange-50/50 dark:bg-orange-950/10 border border-orange-100/50 dark:border-orange-950/20 rounded-2xl flex flex-col gap-3 relative overflow-hidden">
-          <div className="absolute -right-6 -bottom-6 w-16 h-16 bg-[var(--primary-light)] opacity-40 rounded-full blur-xl" />
-          <div className="flex items-center gap-2 text-[var(--primary)] font-bold text-xs uppercase tracking-wider">
-            <i className="fa-solid fa-wand-magic-sparkles text-[11px] animate-pulse" />
-            CaterFlow Plus
+      {profile?.role !== 'SUPER_ADMIN' && (
+        <div className="px-4 mb-4">
+          <div className="p-4 bg-orange-50/50 dark:bg-orange-950/10 border border-orange-100/50 dark:border-orange-950/20 rounded-2xl flex flex-col gap-3 relative overflow-hidden">
+            <div className="absolute -right-6 -bottom-6 w-16 h-16 bg-[var(--primary-light)] opacity-40 rounded-full blur-xl" />
+            <div className="flex items-center gap-2 text-[var(--primary)] font-bold text-xs uppercase tracking-wider">
+              <i className="fa-solid fa-wand-magic-sparkles text-[11px] animate-pulse" />
+              CaterFlow Plus
+            </div>
+            <p className="text-xs text-slate-600 dark:text-stone-300 leading-relaxed font-medium">
+              Streamline catering operations with real-time analytics.
+            </p>
+            <button 
+              onClick={openUpgrade}
+              className="flat-button py-2 px-3 text-xs w-full justify-center rounded-lg shadow-sm hover:shadow"
+            >
+              Upgrade Now
+            </button>
           </div>
-          <p className="text-xs text-slate-600 dark:text-stone-300 leading-relaxed font-medium">
-            Streamline catering operations with real-time analytics.
-          </p>
-          <button 
-            onClick={openUpgrade}
-            className="flat-button py-2 px-3 text-xs w-full justify-center rounded-lg shadow-sm hover:shadow"
-          >
-            Upgrade Now
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Footer Nav */}
       <div className="p-4 border-t border-[var(--border)] space-y-1">

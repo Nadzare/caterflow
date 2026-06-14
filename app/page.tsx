@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/lib/AuthContext';
 import { useModals } from '@/components/ModalsContext';
+import { RegistrationModal } from '@/components/RegistrationModal';
 
 // ─── Translation Dictionary ────────────────────────────────────────────────
 const translations = {
@@ -323,6 +324,7 @@ export default function LandingPage() {
   const [selectedFeature, setSelectedFeature] = useState<'kanban' | 'lstm' | 'dietary'>('kanban');
   const [lang, setLang] = useState<Lang>('id');
   const [scrolled, setScrolled] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   const t = translations[lang];
   const toggleLang = () => setLang((l) => (l === 'id' ? 'en' : 'id'));
@@ -440,42 +442,46 @@ export default function LandingPage() {
             </button>
 
             {/* Sign in */}
-            <Link
-              href="/dashboard"
-              onClick={(e) => {
-                if (!user) {
-                  e.preventDefault();
-                  openAuth('login');
-                }
-              }}
-              className={`text-sm font-semibold transition-colors duration-300 ${
-                scrolled
-                  ? 'text-slate-600 dark:text-stone-300 hover:text-[var(--primary)]'
-                  : 'text-white/90 hover:text-white'
-              }`}
-              style={{ outline: 'none' }}
-            >
-              {t.nav_signin}
-            </Link>
+            {!user ? (
+              <button
+                onClick={() => openAuth('login')}
+                className={`text-sm font-semibold transition-colors duration-300 cursor-pointer ${
+                  scrolled
+                    ? 'text-slate-600 dark:text-stone-300 hover:text-[var(--primary)]'
+                    : 'text-white/90 hover:text-white'
+                }`}
+                style={{ outline: 'none' }}
+              >
+                {t.nav_signin}
+              </button>
+            ) : null}
 
             {/* CTA button */}
-            <Link
-              href="/dashboard"
-              onClick={(e) => {
+            <button
+              onClick={() => {
                 if (!user) {
-                  e.preventDefault();
-                  openAuth('login');
+                  setRegisterOpen(true);
+                } else {
+                  window.location.href = '/dashboard';
                 }
               }}
               style={{ outline: 'none' }}
-              className={`flex items-center gap-1.5 font-black text-sm transition-all duration-300 ${
+              className={`flex items-center gap-1.5 font-black text-sm transition-all duration-300 cursor-pointer ${
                 scrolled
                   ? 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white py-2 px-4 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-px'
                   : 'bg-white/15 hover:bg-white/25 border border-white/30 text-white py-2.5 px-5 rounded-full shadow-sm backdrop-blur-sm'
               }`}
             >
-              {t.nav_dashboard} <i className="fa-solid fa-right-to-bracket text-[10px]" />
-            </Link>
+              {user ? (
+                <>
+                  {t.nav_dashboard} <i className="fa-solid fa-right-to-bracket text-[10px]" />
+                </>
+              ) : (
+                <>
+                  Coba Gratis <i className="fa-solid fa-arrow-right text-[10px]" />
+                </>
+              )}
+            </button>
           </div>
 
           {/* Mobile right */}
@@ -577,7 +583,7 @@ export default function LandingPage() {
                   onClick={(e) => {
                     if (!user) {
                       e.preventDefault();
-                      openAuth('login');
+                      setRegisterOpen(true);
                     }
                   }}
                   className="bg-white text-[#FF6B35] font-black text-sm px-8 py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center gap-2 group"
@@ -933,7 +939,7 @@ export default function LandingPage() {
                   onClick={(e) => {
                     if (!user) {
                       e.preventDefault();
-                      openAuth('login');
+                      setRegisterOpen(true);
                     }
                   }}
                   className={`w-full py-3.5 font-black text-sm rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 ${plan.popular ? 'bg-gradient-to-r from-[var(--primary)] to-amber-500 hover:opacity-90 text-white shadow-lg shadow-orange-500/20' : 'bg-slate-50 hover:bg-slate-100 dark:bg-stone-900 dark:hover:bg-stone-800 text-slate-700 dark:text-stone-200 border border-[var(--border)]'}`}
@@ -1007,6 +1013,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
+      <RegistrationModal isOpen={registerOpen} onClose={() => setRegisterOpen(false)} />
     </div>
   );
 }

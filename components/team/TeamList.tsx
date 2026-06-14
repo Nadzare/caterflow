@@ -171,13 +171,9 @@ export function TeamList({ initialMembers }: TeamListProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-stone-100">Manajemen Tim</h1>
-          <p className="text-sm text-slate-500 dark:text-stone-400 font-medium">Kelola akses, hak istimewa, dan staf katering internal Anda.</p>
-        </div>
+      <div className="flex justify-end">
         <button onClick={handleOpenCreate} className="flat-button">
           <i className="fa-solid fa-user-plus mr-1.5" /> Tambah Staf Baru
         </button>

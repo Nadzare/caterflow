@@ -1,16 +1,67 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { getDashboardStats } from '@/app/actions/dashboardActions';
 import { OrderChart } from '@/components/dashboard/OrderChart';
+import { SuperAdminDashboard } from '@/components/dashboard/SuperAdminDashboard';
+import { useAuth } from '@/lib/AuthContext';
 
+export default function DashboardPage() {
+  const { profile } = useAuth();
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+  useEffect(() => {
+    async function loadStats() {
+      if (profile) {
+        if (profile.role === 'SUPER_ADMIN') {
+          setLoading(false);
+          return;
+        }
+        setLoading(true);
+        try {
+          const data = await getDashboardStats(profile.tenantId || undefined);
+          setStats(data);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    loadStats();
+  }, [profile]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#FAF6F0] dark:bg-[#12100E] transition-colors duration-300">
+        <div className="flex flex-col items-center gap-3">
+          <i className="fa-solid fa-circle-notch animate-spin text-[var(--primary)] text-xl" />
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Memuat Dashboard...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Super Admin panel if role is SUPER_ADMIN
+  if (profile?.role === 'SUPER_ADMIN') {
+    return <SuperAdminDashboard />;
+  }
+
+  // Fallback default stats if load failed
+  const finalStats = stats || {
+    totalRevenue: 0,
+    activeOrdersCount: 0,
+    topMenus: [],
+    chartData: [],
+  };
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Page Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-stone-100">Dashboard</h1>
-        <p className="text-sm text-slate-500 dark:text-stone-400 font-medium">Hello Orlando, welcome back to your catering dashboard.</p>
+        <p className="text-sm text-slate-500 dark:text-stone-400 font-medium">Hello {profile?.name || 'User'}, welcome back to your catering dashboard.</p>
       </div>
 
       {/* Stats Cards */}
@@ -23,7 +74,7 @@ export default async function DashboardPage() {
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold text-slate-400 dark:text-stone-500 uppercase tracking-wider">Total Revenue</span>
             <div className="text-2xl font-bold text-slate-800 dark:text-stone-100 mt-1">
-              Rp {stats.totalRevenue.toLocaleString()}
+              Rp {finalStats.totalRevenue.toLocaleString()}
             </div>
             <div className="text-[11px] text-emerald-500 font-semibold flex items-center gap-1 mt-1.5">
               <i className="fa-solid fa-chart-line text-[11px] mr-1" /> +12.4% vs last month
@@ -39,7 +90,7 @@ export default async function DashboardPage() {
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold text-slate-400 dark:text-stone-500 uppercase tracking-wider">Active Orders</span>
             <div className="text-2xl font-bold text-slate-800 dark:text-stone-100 mt-1">
-              {stats.activeOrdersCount}
+              {finalStats.activeOrdersCount}
             </div>
             <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-2 flex items-center gap-1">
               <i className="fa-regular fa-clock text-xs mr-1" /> In production & delivery
@@ -70,8 +121,8 @@ export default async function DashboardPage() {
           </div>
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold text-slate-400 dark:text-stone-500 uppercase tracking-wider">Top Menu</span>
-            <div className="text-lg font-bold text-slate-800 dark:text-stone-100 mt-1 truncate" title={stats.topMenus[0]?.name || 'N/A'}>
-              {stats.topMenus[0]?.name || 'N/A'}
+            <div className="text-lg font-bold text-slate-800 dark:text-stone-100 mt-1 truncate" title={finalStats.topMenus[0]?.name || 'N/A'}>
+              {finalStats.topMenus[0]?.name || 'N/A'}
             </div>
             <div className="text-[11px] text-slate-400 dark:text-stone-500 mt-2">
               Most popular this week
@@ -93,7 +144,7 @@ export default async function DashboardPage() {
               This Week
             </span>
           </div>
-          <OrderChart data={stats.chartData} />
+          <OrderChart data={finalStats.chartData} />
         </div>
 
         {/* Top Menus Section */}
@@ -103,7 +154,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-slate-400 dark:text-stone-500">Most preferred dishes by client volume</p>
           </div>
           <div className="space-y-4">
-            {stats.topMenus.map((menu, i) => (
+            {finalStats.topMenus.map((menu: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-[#221F1C] transition-colors duration-200">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/10 text-[var(--primary)] flex items-center justify-center text-xs font-extrabold">
@@ -122,4 +173,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-

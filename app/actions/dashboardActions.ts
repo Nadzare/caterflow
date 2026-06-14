@@ -2,14 +2,17 @@
 
 import { prisma } from '@/lib/prisma';
 
-export async function getDashboardStats() {
+export async function getDashboardStats(tenantId?: string) {
   try {
+    const tenantFilter = tenantId ? { tenantId } : {};
+
     const totalRevenue = await prisma.order.aggregate({
       _sum: {
         totalAmount: true,
       },
       where: {
         status: 'COMPLETED',
+        ...tenantFilter,
       },
     });
 
@@ -18,11 +21,17 @@ export async function getDashboardStats() {
         status: {
           in: ['DP_PAID', 'IN_PRODUCTION', 'DELIVERING'],
         },
+        ...tenantFilter,
       },
     });
 
     const topMenus = await prisma.orderItem.groupBy({
       by: ['menuId'],
+      where: tenantId ? {
+        order: {
+          tenantId
+        }
+      } : {},
       _count: {
         menuId: true,
       },
@@ -56,6 +65,7 @@ export async function getDashboardStats() {
         orderDate: {
           gte: sevenDaysAgo,
         },
+        ...tenantFilter,
       },
       select: {
         orderDate: true,

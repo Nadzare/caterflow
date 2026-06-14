@@ -9,6 +9,7 @@ datasource db {
 }
 
 enum Role {
+  SUPER_ADMIN
   OWNER
   ADMIN
   KITCHEN
@@ -30,6 +31,8 @@ model User {
   phone     String?
   role      Role     @default(ADMIN)
   activated Boolean  @default(false)
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -43,6 +46,8 @@ model Client {
   logisticAddress        String
   dietaryAlerts          Json?
   operationalPreferences Json?
+  tenantId               String?
+  tenant                 Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   orders                 Order[]
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -54,6 +59,8 @@ model Menu {
   category       String
   basePrice      Float
   allergenLabels Json?
+  tenantId       String?
+  tenant         Tenant?     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   orderItems     OrderItem[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
@@ -66,6 +73,8 @@ model Order {
   status      OrderStatus @default(QUOTATION)
   totalAmount Float
   orderDate   DateTime
+  tenantId    String?
+  tenant      Tenant?     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
   delivery    Delivery?
   createdAt   DateTime    @default(now())
@@ -92,3 +101,27 @@ model Delivery {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model RegistrationRequest {
+  id          String   @id @default(uuid())
+  companyName String
+  picName     String
+  email       String   @unique
+  phone       String
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  clients   Client[]
+  menus     Menu[]
+  orders    Order[]
+}
+
