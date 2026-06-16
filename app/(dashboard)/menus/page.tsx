@@ -1,23 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getClients } from '@/app/actions/clientActions';
-import { ClientsList } from '@/components/clients/ClientsList';
+import { getMenus } from '@/app/actions/menuActions';
+import { MenusList } from '@/components/menus/MenusList';
 import { RoleGuard } from '@/components/RoleGuard';
 import { useAuth } from '@/lib/AuthContext';
 
-export default function ClientsPage() {
+export default function MenusPage() {
   const { profile } = useAuth();
-  const [clients, setClients] = useState<any[]>([]);
+  const [menus, setMenus] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadClients() {
+    async function loadMenus() {
       if (profile) {
         setLoading(true);
         try {
-          const data = await getClients(profile.tenantId || undefined);
-          setClients(data);
+          const data = await getMenus(profile.tenantId || undefined);
+          setMenus(data);
         } catch (error) {
           console.error(error);
         } finally {
@@ -25,10 +26,10 @@ export default function ClientsPage() {
         }
       }
     }
-    loadClients();
+    loadMenus();
   }, [profile]);
 
-  const clientsKey = clients.map((c) => c.id).join(',');
+  const menusKey = menus.map((m) => m.id).join(',');
 
   return (
     <RoleGuard allowedRoles={['OWNER', 'ADMIN']}>
@@ -38,7 +39,7 @@ export default function ClientsPage() {
             <i className="fa-solid fa-circle-notch animate-spin text-[var(--primary)] text-xl" />
           </div>
         ) : (
-          <ClientsList key={clientsKey} initialClients={clients} />
+          <MenusList key={menusKey} initialMenus={menus} />
         )}
       </div>
     </RoleGuard>

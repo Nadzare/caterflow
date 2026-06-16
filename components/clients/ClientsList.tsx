@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 
 import { createClient, updateClient, deleteClient } from '@/app/actions/clientActions';
 import { useToast } from '@/components/Toast';
+import { useAuth } from '@/lib/AuthContext';
 
 interface Client {
   id: string;
@@ -27,12 +29,10 @@ const COMMON_ALLERGIES = ['Peanut', 'Dairy', 'Gluten', 'Soy', 'Seafood', 'Nut'];
 
 export function ClientsList({ initialClients }: ClientsListProps) {
   const { toast } = useToast();
+  const { profile } = useAuth();
   const [clients, setClients] = useState<Client[]>(initialClients);
 
-  // Update local client list when server props change
-  useEffect(() => {
-    setClients(initialClients);
-  }, [initialClients]);
+
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -140,7 +140,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
     };
 
     if (modalMode === 'create') {
-      const res = await createClient(data);
+      const res = await createClient(data, profile?.tenantId || undefined);
       if (res.success && res.client) {
         toast(`Client "${companyName}" created successfully!`, 'success');
         
@@ -571,7 +571,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
             </div>
             <h3 className="text-base font-extrabold text-slate-800 dark:text-stone-100 mb-1.5">Delete Client</h3>
             <p className="text-xs text-slate-400 font-medium mb-6 leading-relaxed">
-              Are you sure you want to delete client <span className="font-bold text-slate-700 dark:text-stone-200">"{clientToDelete?.companyName}"</span>? This will also remove all associated B2B orders and logistics deliveries.
+              Are you sure you want to delete client <span className="font-bold text-slate-700 dark:text-stone-200">&quot;{clientToDelete?.companyName}&quot;</span>? This will also remove all associated B2B orders and logistics deliveries.
             </p>
             <div className="flex gap-3">
               <button 

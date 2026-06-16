@@ -33,13 +33,40 @@ export async function getOrdersByStatus(tenantId?: string) {
 
 export async function updateOrderStatus(orderId: string, newStatus: OrderStatus) {
   try {
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { status: newStatus },
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { id: orderId },
+        data: { status: newStatus },
+      });
+
+      if (['DELIVERING', 'COMPLETED'].includes(newStatus)) {
+        const dDate = order.orderDate || new Date();
+        const dStatus = newStatus === 'COMPLETED' ? 'DELIVERED' : 'SCHEDULED';
+
+        await tx.delivery.upsert({
+          where: { orderId },
+          update: {
+            status: dStatus,
+          },
+          create: {
+            orderId,
+            deliveryDate: dDate,
+            deliveryTime: '11:00',
+            status: dStatus,
+          },
+        });
+      } else {
+        await tx.delivery.deleteMany({
+          where: { orderId },
+        });
+      }
+
+      return order;
     });
     
     revalidatePath('/orders');
     revalidatePath('/dashboard');
+    revalidatePath('/deliveries');
     
     return { success: true, order: updatedOrder };
   } catch (error) {

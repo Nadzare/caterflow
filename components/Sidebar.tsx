@@ -16,6 +16,7 @@ function cn(...inputs: ClassValue[]) {
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', iconClass: 'fa-solid fa-chart-pie' },
   { name: 'Clients', href: '/clients', iconClass: 'fa-solid fa-users' },
+  { name: 'Menus', href: '/menus', iconClass: 'fa-solid fa-utensils' },
   { name: 'Orders', href: '/orders', iconClass: 'fa-solid fa-clipboard-list' },
   { name: 'Deliveries', href: '/deliveries', iconClass: 'fa-regular fa-calendar-days' },
   { name: 'Team', href: '/team', iconClass: 'fa-solid fa-user-shield' },
@@ -32,7 +33,7 @@ export function Sidebar() {
     if (profile?.role === 'SUPER_ADMIN') {
       return item.href === '/dashboard';
     }
-    if (item.href === '/clients' || item.href === '/team') {
+    if (item.href === '/clients' || item.href === '/menus' || item.href === '/team') {
       return isOwnerOrAdmin;
     }
     return true;

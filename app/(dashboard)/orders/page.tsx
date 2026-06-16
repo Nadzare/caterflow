@@ -43,6 +43,8 @@ export default function OrdersPage() {
     loadOrdersData();
   }, [profile]);
 
+  const ordersKey = Object.values(orders).flatMap((col: any) => col.map((o: any) => o.id + o.status)).join(',');
+
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {loading ? (
@@ -50,7 +52,7 @@ export default function OrdersPage() {
           <i className="fa-solid fa-circle-notch animate-spin text-[var(--primary)] text-xl" />
         </div>
       ) : (
-        <KanbanBoard initialData={orders} clients={clients} menus={menus} />
+        <KanbanBoard key={ordersKey} initialData={orders} clients={clients} menus={menus} />
       )}
     </div>
   );
