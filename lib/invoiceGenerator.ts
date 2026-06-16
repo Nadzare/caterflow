@@ -5,6 +5,7 @@ export interface InvoiceData {
   id: string;
   orderDate: Date | string;
   totalAmount: number;
+  status: string;
   client: {
     companyName: string;
     picName: string;
@@ -61,14 +62,30 @@ export function generateInvoicePDF(order: InvoiceData) {
   doc.setFontSize(18);
   doc.text('INVOICE', 140, 20);
 
-  // PAID STAMP (2D Flat style)
-  doc.setDrawColor(16, 185, 129); // Emerald 500
-  doc.setFillColor(209, 250, 229); // Emerald 100
+  // STAMP (2D Flat style) based on status
+  let stampText = 'PAID / COMPLETED';
+  let drawColor: [number, number, number] = [16, 185, 129]; // Emerald 500
+  let fillColor: [number, number, number] = [209, 250, 229]; // Emerald 100
+
+  if (order.status === 'QUOTATION') {
+    stampText = 'UNPAID / QUOTATION';
+    drawColor = [239, 68, 68]; // Red 500
+    fillColor = [254, 226, 226]; // Red 100
+  } else if (['DP_PAID', 'IN_PRODUCTION', 'DELIVERING'].includes(order.status)) {
+    stampText = 'DP PAID';
+    drawColor = [59, 130, 246]; // Blue 500
+    fillColor = [219, 234, 254]; // Blue 100
+  }
+
+  doc.setDrawColor(drawColor[0], drawColor[1], drawColor[2]);
+  doc.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
   doc.rect(140, 24, 40, 8, 'FD');
-  doc.setTextColor(16, 185, 129);
+  doc.setTextColor(drawColor[0], drawColor[1], drawColor[2]);
   doc.setFontSize(9);
   doc.setFont('Helvetica', 'bold');
-  doc.text('PAID / COMPLETED', 142.5, 29.5);
+  const textWidth = doc.getTextWidth(stampText);
+  const textX = 140 + (40 - textWidth) / 2;
+  doc.text(stampText, textX, 29.5);
 
   // Decorative Horizontal Line
   doc.setDrawColor(237, 232, 224); // #EDE8E0
@@ -160,10 +177,32 @@ export function generateInvoicePDF(order: InvoiceData) {
   doc.text('Tax (0%):', 130, finalY + 5);
   doc.text('Rp 0', 195, finalY + 5, { align: 'right' });
 
+  let totalPaid = order.totalAmount;
+  let balanceDue = 0;
+  let paidLabel = 'Total Paid:';
+  let balanceLabel = 'Balance Due:';
+
+  if (order.status === 'QUOTATION') {
+    totalPaid = 0;
+    balanceDue = order.totalAmount;
+    paidLabel = 'Total Paid (0%):';
+  } else if (['DP_PAID', 'IN_PRODUCTION', 'DELIVERING'].includes(order.status)) {
+    totalPaid = order.totalAmount * 0.5;
+    balanceDue = order.totalAmount * 0.5;
+    paidLabel = 'Total Paid (50% DP):';
+    balanceLabel = 'Balance Due (50%):';
+  }
+
   doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(12);
-  doc.text('Total Paid:', 130, finalY + 12);
-  doc.text(`Rp ${order.totalAmount.toLocaleString('id-ID')}`, 195, finalY + 12, { align: 'right' });
+  doc.setFontSize(11);
+  doc.text(paidLabel, 130, finalY + 12);
+  doc.text(`Rp ${totalPaid.toLocaleString('id-ID')}`, 195, finalY + 12, { align: 'right' });
+
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(balanceDue > 0 ? 239 : darkTextColor[0], balanceDue > 0 ? 68 : darkTextColor[1], balanceDue > 0 ? 68 : darkTextColor[2]);
+  doc.text(balanceLabel, 130, finalY + 18);
+  doc.text(`Rp ${balanceDue.toLocaleString('id-ID')}`, 195, finalY + 18, { align: 'right' });
 
   // 5. Footer Terms & Thank You
   doc.setTextColor(lightGrey[0], lightGrey[1], lightGrey[2]);

@@ -92,7 +92,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
     setSelectedOrderId(order.id);
     setClientId(details.clientId);
     setOrderDate(new Date(details.orderDate).toISOString().split('T')[0]);
-    setStatus(details.status);
+    setStatus(order.status);
     setItems(
       details.orderItems.map((item: any) => ({
         menuId: item.menuId,
@@ -243,7 +243,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const activeColumn = findColumn(activeId);
+    const activeColumn = activeOrder?.status as OrderStatus;
     const overColumn = overId in data ? (overId as OrderStatus) : findColumn(overId);
 
     if (!activeColumn || !overColumn) {
@@ -296,7 +296,7 @@ export function KanbanBoard({ initialData, clients, menus }: KanbanBoardProps) {
         [activeColumn]: activeItems.filter((i) => i.id !== activeId),
         [overColumn]: [
           ...overItems.slice(0, newOverIndex),
-          activeItems[activeIndex],
+          { ...activeItems[activeIndex], status: overColumn },
           ...overItems.slice(newOverIndex),
         ],
       };
