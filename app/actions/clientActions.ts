@@ -14,6 +14,11 @@ export async function getClients(tenantId?: string) {
         _count: {
           select: { orders: true },
         },
+        orders: {
+          select: { orderDate: true },
+          orderBy: { orderDate: 'desc' },
+          take: 1,
+        },
       },
     });
     return clients;

@@ -19,11 +19,23 @@ interface Client {
   _count: {
     orders: number;
   };
+  orders?: Array<{
+    orderDate: Date | string;
+  }>;
 }
 
 interface ClientsListProps {
   initialClients: Client[];
 }
+
+const sanitizePhoneNumber = (phone: string | null) => {
+  if (!phone) return '';
+  let cleaned = phone.replace(/[^0-9]/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '62' + cleaned.slice(1);
+  }
+  return cleaned;
+};
 
 const COMMON_ALLERGIES = ['Peanut', 'Dairy', 'Gluten', 'Soy', 'Seafood', 'Nut'];
 
@@ -320,6 +332,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider">Contact Info</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider">Dietary Alerts</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider text-right">Orders</th>
+                <th className="py-4 px-6 text-[11px] font-bold text-slate-400 dark:text-stone-500 uppercase tracking-wider text-right">Last Order</th>
                 <th className="py-4 px-6 w-12"></th>
               </tr>
             </thead>
@@ -343,7 +356,23 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                           <i className="fa-regular fa-envelope w-3.5 h-3.5 flex items-center justify-center text-slate-400" /> {client.email || '—'}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-stone-400">
-                          <i className="fa-solid fa-phone w-3.5 h-3.5 flex items-center justify-center text-slate-400" /> {client.phone || '—'}
+                          <i className="fa-solid fa-phone w-3.5 h-3.5 flex items-center justify-center text-slate-400" />
+                          {client.phone ? (
+                            <span className="flex items-center gap-1">
+                              {client.phone}
+                              <a
+                                href={`https://wa.me/${sanitizePhoneNumber(client.phone)}?text=${encodeURIComponent(`Halo ${client.picName} dari ${client.companyName}, ada yang bisa kami bantu mengenai layanan katering kami?`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-500 hover:text-emerald-600 transition-colors duration-150 cursor-pointer inline-flex items-center"
+                                title="Chat via WhatsApp"
+                              >
+                                <i className="fa-brands fa-whatsapp text-sm ml-0.5" />
+                              </a>
+                            </span>
+                          ) : (
+                            '—'
+                          )}
                         </div>
                       </div>
                     </td>
@@ -372,6 +401,66 @@ export function ClientsList({ initialClients }: ClientsListProps) {
                     </td>
                     <td className="py-4 px-6 text-sm text-right font-semibold text-slate-700 dark:text-stone-200">
                       {client._count.orders}
+                    </td>
+                    <td className="py-4 px-6 text-sm text-right">
+                      {(() => {
+                        const lastOrder = client.orders?.[0];
+                        if (!lastOrder) {
+                          const waMessage = `Halo ${client.picName} dari ${client.companyName}, kami dari CaterFlow catering ingin menyapa kembali. Apakah ada kebutuhan catering yang bisa kami bantu dalam waktu dekat? 😊`;
+                          return (
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="text-slate-400 dark:text-stone-500 font-medium">Never</span>
+                              {client.phone && (
+                                <a
+                                  href={`https://wa.me/${sanitizePhoneNumber(client.phone)}?text=${encodeURIComponent(waMessage)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:hover:bg-amber-950/30 border border-amber-100/30 dark:border-amber-900/20 text-[10px] font-bold rounded-lg cursor-pointer transition-colors duration-150"
+                                >
+                                  <i className="fa-brands fa-whatsapp text-xs" /> Follow Up
+                                </a>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        const lastDate = new Date(lastOrder.orderDate);
+                        const lastOrderDateStr = lastDate.toLocaleDateString('id-ID', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        });
+                        const diffTime = Math.abs(new Date().getTime() - lastDate.getTime());
+                        const daysSince = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        const isInactive = daysSince > 14;
+
+                        if (isInactive) {
+                          const waMessage = `Halo ${client.picName} dari ${client.companyName}, kami dari CaterFlow catering ingin menyapa kembali. Apakah ada kebutuhan catering yang bisa kami bantu dalam waktu dekat? 😊`;
+                          return (
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="font-semibold text-rose-500 dark:text-rose-400">{lastOrderDateStr}</span>
+                              <span className="text-[10px] text-rose-400 dark:text-stone-500 font-bold uppercase tracking-wider">Idle {daysSince} hari</span>
+                              {client.phone && (
+                                <a
+                                  href={`https://wa.me/${sanitizePhoneNumber(client.phone)}?text=${encodeURIComponent(waMessage)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/20 dark:hover:bg-rose-950/30 border border-rose-100/30 dark:border-rose-900/20 text-[10px] font-bold rounded-lg cursor-pointer transition-colors duration-150"
+                                >
+                                  <i className="fa-brands fa-whatsapp text-xs" /> Follow Up
+                                </a>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div className="flex flex-col items-end">
+                            <span className="font-semibold text-slate-700 dark:text-stone-300">{lastOrderDateStr}</span>
+                            <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">Active</span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="py-4 px-6 text-right relative">
                       <button 
@@ -404,7 +493,7 @@ export function ClientsList({ initialClients }: ClientsListProps) {
               })}
               {filteredClients.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-xs font-bold text-slate-400 dark:text-stone-500">
+                  <td colSpan={7} className="py-8 text-center text-xs font-bold text-slate-400 dark:text-stone-500">
                     No clients match the search and filters.
                   </td>
                 </tr>

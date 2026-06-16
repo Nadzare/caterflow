@@ -6,6 +6,15 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { generateInvoicePDF } from '@/lib/invoiceGenerator';
 
+const sanitizePhoneNumber = (phone: string | null) => {
+  if (!phone) return '';
+  let cleaned = phone.replace(/[^0-9]/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '62' + cleaned.slice(1);
+  }
+  return cleaned;
+};
+
 interface KanbanCardProps {
   order: any;
   onEditOrder?: (order: any) => void;
@@ -15,6 +24,11 @@ interface KanbanCardProps {
 export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [origin, setOrigin] = useState('');
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const {
     attributes,
@@ -169,14 +183,63 @@ export function KanbanCard({ order, onEditOrder, onDeleteOrder }: KanbanCardProp
         </span>
       </div>
 
-      {order.status === 'COMPLETED' && (
-        <button
-          onClick={handleDownloadInvoice}
-          className="mt-4 w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
-        >
-          <i className="fa-solid fa-file-invoice text-xs" />
-          Download Invoice
-        </button>
+      {['QUOTATION', 'DP_PAID', 'IN_PRODUCTION', 'DELIVERING', 'COMPLETED'].includes(order.status) && (
+        <div className="mt-4 flex gap-2 w-full">
+          <button
+            onClick={handleDownloadInvoice}
+            className="flex-1 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-stone-800 dark:hover:bg-stone-750 text-slate-700 dark:text-stone-300 font-bold text-[10px] rounded-xl border border-slate-100/50 dark:border-stone-700/30 flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer"
+            title="Download Invoice PDF"
+          >
+            <i className="fa-solid fa-file-invoice text-xs text-slate-400" />
+            Download
+          </button>
+          
+          {order.client.phone && (
+            <a
+              href={(() => {
+                let statusText = 'Lunas / Selesai ✅';
+                let extraInfo = '';
+                
+                if (order.status === 'QUOTATION') {
+                  statusText = 'Quotation / Belum Dibayar 📄';
+                  extraInfo = `• *Total Tagihan:* Rp ${order.totalAmount.toLocaleString('id-ID')}
+• *Sisa Tagihan:* Rp ${order.totalAmount.toLocaleString('id-ID')}`;
+                } else if (['DP_PAID', 'IN_PRODUCTION', 'DELIVERING'].includes(order.status)) {
+                  statusText = 'Uang Muka Lunas (DP Paid) 💳';
+                  const half = order.totalAmount * 0.5;
+                  extraInfo = `• *Total Tagihan:* Rp ${order.totalAmount.toLocaleString('id-ID')}
+• *Telah Dibayar (DP 50%):* Rp ${half.toLocaleString('id-ID')}
+• *Sisa Tagihan (50%):* Rp ${half.toLocaleString('id-ID')}`;
+                } else {
+                  extraInfo = `• *Total Tagihan:* Rp ${order.totalAmount.toLocaleString('id-ID')}
+• *Telah Dibayar (Lunas):* Rp ${order.totalAmount.toLocaleString('id-ID')}`;
+                }
+
+                const message = `Halo *${order.client.picName}* dari *${order.client.companyName}*,
+
+Berikut rincian tagihan (invoice) untuk pesanan *#${order.id.slice(0, 8).toUpperCase()}*:
+
+• *Status:* ${statusText}
+${extraInfo}
+
+Lihat detail & unduh Invoice Digital Anda di sini:
+${origin ? `${origin}/invoices/${order.id}` : ''}
+
+Terima kasih atas kerja samanya! 😊`;
+
+                return `https://wa.me/${sanitizePhoneNumber(order.client.phone)}?text=${encodeURIComponent(message)}`;
+              })()}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 py-2 px-2.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] rounded-xl border border-emerald-100/50 dark:border-emerald-900/20 flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer text-center"
+              title="Kirim Invoice via WhatsApp"
+            >
+              <i className="fa-brands fa-whatsapp text-xs" />
+              Kirim WA
+            </a>
+          )}
+        </div>
       )}
     </div>
   );
